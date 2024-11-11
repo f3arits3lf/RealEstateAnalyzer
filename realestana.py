@@ -2,6 +2,8 @@ import streamlit as st
 import numpy as np
 import numpy_financial as npf
 import json
+import pandas as pd
+import plotly.express as px
 
 # Function to calculate mortgage payment
 def calculate_mortgage_payment(loan_amount, monthly_interest, num_payments):
@@ -132,7 +134,10 @@ def main():
         perform_sensitivity_analysis_button = st.button("Perform Sensitivity Analysis", key="sensitivity_analysis")
         if perform_sensitivity_analysis_button:
             try:
-                sensitivity_results = []
+                # Create an empty list to store data for DataFrame
+                data = []
+
+                # Perform sensitivity analysis
                 for rate in interest_rates:
                     for rent in rent_values:
                         adjusted_rent = rent * 12
@@ -141,8 +146,23 @@ def main():
                         annual_debt_service = mortgage_payment * 12
                         noi = adjusted_rent - total_expenses
                         cash_flow = noi - annual_debt_service
-                        sensitivity_results.append(f"Interest Rate: {rate:.2f}%, Rent: ${rent:,.2f} -> NOI: ${noi:,.2f}, Cash Flow: ${cash_flow:,.2f}")
-                st.write("\n\n".join(sensitivity_results))
+
+                        # Append each result as a dictionary to the data list
+                        data.append({
+                            "Interest Rate (%)": rate,
+                            "Rent ($)": rent,
+                            "Cash Flow ($)": cash_flow
+                        })
+
+                # Create a DataFrame from the data
+                df = pd.DataFrame(data)
+
+                # Create an interactive Plotly scatter plot
+                fig = px.scatter(df, x="Interest Rate (%)", y="Rent ($)", size="Cash Flow ($)", color="Cash Flow ($)",
+                                 hover_name="Cash Flow ($)", title="Sensitivity Analysis of Cash Flow",
+                                 labels={"Interest Rate (%)": "Interest Rate (%)", "Rent ($)": "Rent ($)", "Cash Flow ($)": "Cash Flow ($)"})
+                st.plotly_chart(fig)
+
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 
