@@ -144,7 +144,7 @@ def main():
         st.header("Support My Work")
         st.write("If you enjoy using this tool, consider supporting my work!")
         if st.button("Buy Me a Coffee", key="donate_button"):
-            st.markdown("[Buy Me a Coffee](https://www.buymeacoffee.com/scottyoungdev)")
+            st.markdown("[Buy Me a Coffee](https://buymeacoffee.com/scottalafol)")
 
 if __name__ == "__main__":
     main()
