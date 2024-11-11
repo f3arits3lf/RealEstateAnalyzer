@@ -128,8 +128,8 @@ def main():
                         annual_debt_service = mortgage_payment * 12
                         noi = adjusted_rent - total_expenses
                         cash_flow = noi - annual_debt_service
-                        sensitivity_results.append(f"Interest Rate: {rate:.2f}%, Rent: ${rent:.2f} -> NOI: ${noi:,.2f}, Cash Flow: ${cash_flow:,.2f}")
-                st.write("\n".join(sensitivity_results))
+                        sensitivity_results.append(f"Interest Rate: {rate:.2f}%, Rent: ${rent:,.2f} -> NOI: ${noi:,.2f}, Cash Flow: ${cash_flow:,.2f}")
+                st.write("\n\n".join(sensitivity_results))
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 
