@@ -1,7 +1,9 @@
 import streamlit as st
 import numpy as np
 import numpy_financial as npf
-import json
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Function to calculate mortgage payment
 def calculate_mortgage_payment(loan_amount, monthly_interest, num_payments):
@@ -108,9 +110,9 @@ def main():
         adjusted_rent = st.slider("Adjusted Monthly Rent Income ($):", min_value=0, max_value=10000, value=int(rent_income), step=100, key="adjusted_rent")
         adjusted_expenses = st.slider("Adjusted Operating Expenses ($/month):", min_value=0, max_value=5000, value=int(operating_expenses), step=50, key="adjusted_expenses")
         calculate_scenario_metrics_button = st.button("Calculate Scenario Metrics", key="calc_scenario")
+
         if calculate_scenario_metrics_button:
             try:
-                # Calculate Scenario Metrics
                 adjusted_annual_rent = adjusted_rent * 12
                 adjusted_annual_expenses = adjusted_expenses * 12
                 monthly_interest = interest_rate / 100 / 12
@@ -121,6 +123,31 @@ def main():
                 adjusted_cash_flow = adjusted_noi - annual_debt_service
                 st.write(f"Scenario Net Operating Income (NOI): ${adjusted_noi:,.2f}")
                 st.write(f"Scenario Annual Cash Flow: ${adjusted_cash_flow:,.2f}")
+
+                # Create a heatmap to represent the scenario analysis
+                rent_values = np.linspace(adjusted_rent * 0.8, adjusted_rent * 1.2, 5)
+                expense_values = np.linspace(adjusted_expenses * 0.8, adjusted_expenses * 1.2, 5)
+                heatmap_data = []
+
+                for rent in rent_values:
+                    row = []
+                    for expenses in expense_values:
+                        noi = (rent * 12) - (expenses * 12 + property_tax)
+                        cash_flow = noi - annual_debt_service
+                        row.append(cash_flow)
+                    heatmap_data.append(row)
+
+                # Create the heatmap using Seaborn
+                heatmap_df = pd.DataFrame(heatmap_data, index=[f"${r:,.2f}" for r in rent_values], columns=[f"${e:,.2f}" for e in expense_values])
+                fig, ax = plt.subplots()
+                sns.heatmap(heatmap_df, annot=True, fmt=".2f", cmap="YlGnBu", ax=ax)
+                ax.set_title("Cash Flow Heatmap: Rent vs Operating Expenses")
+                ax.set_xlabel("Operating Expenses ($)")
+                ax.set_ylabel("Monthly Rent ($)")
+
+                # Display the heatmap in Streamlit
+                st.pyplot(fig)
+
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 
@@ -130,9 +157,10 @@ def main():
         interest_rates = np.linspace(interest_rate - 2, interest_rate + 2, 5)
         rent_values = np.linspace(rent_income * 0.8, rent_income * 1.2, 5)
         perform_sensitivity_analysis_button = st.button("Perform Sensitivity Analysis", key="sensitivity_analysis")
+
         if perform_sensitivity_analysis_button:
             try:
-                sensitivity_results = []
+                sensitivity_data = []
                 for rate in interest_rates:
                     for rent in rent_values:
                         adjusted_rent = rent * 12
@@ -141,8 +169,15 @@ def main():
                         annual_debt_service = mortgage_payment * 12
                         noi = adjusted_rent - total_expenses
                         cash_flow = noi - annual_debt_service
-                        sensitivity_results.append(f"Interest Rate: {rate:.2f}%, Rent: ${rent:,.2f} -> NOI: ${noi:,.2f}, Cash Flow: ${cash_flow:,.2f}")
-                st.write("\n\n".join(sensitivity_results))
+                        sensitivity_data.append([rate, rent, noi, cash_flow])
+
+                # Create a DataFrame from sensitivity data
+                sensitivity_df = pd.DataFrame(sensitivity_data, columns=['Interest Rate (%)', 'Monthly Rent ($)', 'NOI ($)', 'Cash Flow ($)'])
+
+                # Plotting with Streamlit
+                st.write("### Sensitivity Analysis Results")
+                st.line_chart(sensitivity_df[['Interest Rate (%)', 'NOI ($)', 'Cash Flow ($)']].set_index('Interest Rate (%)'))
+
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 
