@@ -2,6 +2,9 @@ import streamlit as st
 import numpy as np
 import numpy_financial as npf
 import json
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 
 # Function to calculate mortgage payment
 def calculate_mortgage_payment(loan_amount, monthly_interest, num_payments):
@@ -143,6 +146,18 @@ def main():
                         cash_flow = noi - annual_debt_service
                         sensitivity_results.append(f"Interest Rate: {rate:.2f}%, Rent: ${rent:,.2f} -> NOI: ${noi:,.2f}, Cash Flow: ${cash_flow:,.2f}")
                 st.write("\n\n".join(sensitivity_results))
+
+                # Enhanced Sensitivity Analysis with 3D Charts
+                st.header("Enhanced Sensitivity Analysis with 3D Charts")
+                fig = plt.figure()
+                ax = fig.add_subplot(111, projection='3d')
+                X, Y = np.meshgrid(interest_rates, rent_values)
+                Z = np.array([[(rent * 12 - ((operating_expenses * 12) + property_tax) - (calculate_mortgage_payment(loan_amount, rate / 100 / 12, loan_term * 12) * 12)) for rate in interest_rates] for rent in rent_values])
+                ax.plot_surface(X, Y, Z, cmap=cm.viridis)
+                ax.set_xlabel('Interest Rate (%)')
+                ax.set_ylabel('Rent ($)')
+                ax.set_zlabel('Cash Flow ($)')
+                st.pyplot(fig)
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 
