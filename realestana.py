@@ -46,7 +46,8 @@ def main():
     # Analysis Results Tab
     with tabs[1]:
         st.header("Analysis Results")
-        if st.button("Calculate Metrics"):
+        calculate_metrics_button = st.button("Calculate Metrics", key="calc_metrics")
+        if calculate_metrics_button:
             try:
                 # Extract Input Values
                 rent = rent_income * 12  # Annual Rent
@@ -91,13 +92,18 @@ def main():
     # Scenario Analysis Tab
     with tabs[2]:
         st.header("Scenario Analysis")
-        adjusted_rent = st.slider("Adjusted Monthly Rent Income ($):", min_value=0, max_value=10000, value=int(rent_income), step=100)
-        adjusted_expenses = st.slider("Adjusted Operating Expenses ($/month):", min_value=0, max_value=5000, value=int(operating_expenses), step=50)
-        if st.button("Calculate Scenario Metrics"):
+        adjusted_rent = st.slider("Adjusted Monthly Rent Income ($):", min_value=0, max_value=10000, value=int(rent_income), step=100, key="adjusted_rent")
+        adjusted_expenses = st.slider("Adjusted Operating Expenses ($/month):", min_value=0, max_value=5000, value=int(operating_expenses), step=50, key="adjusted_expenses")
+        calculate_scenario_metrics_button = st.button("Calculate Scenario Metrics", key="calc_scenario")
+        if calculate_scenario_metrics_button:
             try:
                 # Calculate Scenario Metrics
                 adjusted_annual_rent = adjusted_rent * 12
                 adjusted_annual_expenses = adjusted_expenses * 12
+                monthly_interest = interest_rate / 100 / 12
+                num_payments = loan_term * 12
+                mortgage_payment = calculate_mortgage_payment(loan_amount, monthly_interest, num_payments)
+                annual_debt_service = mortgage_payment * 12
                 adjusted_noi = adjusted_annual_rent - (adjusted_annual_expenses + property_tax)
                 adjusted_cash_flow = adjusted_noi - annual_debt_service
                 st.write(f"Scenario Net Operating Income (NOI): ${adjusted_noi:,.2f}")
@@ -110,7 +116,8 @@ def main():
         st.header("Sensitivity Analysis")
         interest_rates = np.linspace(interest_rate - 2, interest_rate + 2, 5)
         rent_values = np.linspace(rent_income * 0.8, rent_income * 1.2, 5)
-        if st.button("Perform Sensitivity Analysis"):
+        perform_sensitivity_analysis_button = st.button("Perform Sensitivity Analysis", key="sensitivity_analysis")
+        if perform_sensitivity_analysis_button:
             try:
                 sensitivity_results = []
                 for rate in interest_rates:
@@ -136,8 +143,8 @@ def main():
     with tabs[5]:
         st.header("Support My Work")
         st.write("If you enjoy using this tool, consider supporting my work!")
-        if st.button("Buy Me a Coffee"):
-            st.markdown("[Buy Me a Coffee](https://buymeacoffee.com/scottalafol)")
+        if st.button("Buy Me a Coffee", key="donate_button"):
+            st.markdown("[Buy Me a Coffee](https://www.buymeacoffee.com/scottyoungdev)")
 
 if __name__ == "__main__":
     main()
