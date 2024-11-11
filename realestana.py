@@ -24,6 +24,10 @@ def calculate_payback_period(down_payment, cash_flow):
         return down_payment / cash_flow
     return float('inf')  # Return infinity if cash_flow is negative
 
+# Function to calculate tax benefits
+def calculate_tax_benefits(depreciation, interest_deduction):
+    return depreciation + interest_deduction
+
 # Streamlit App
 def main():
     st.title("Real Estate Deal Analyzer")
@@ -42,6 +46,9 @@ def main():
         down_payment = st.number_input("Down Payment ($):", min_value=0.0, value=20000.0, step=1000.0)
         interest_rate = st.number_input("Interest Rate (%):", min_value=0.0, value=5.0, step=0.1)
         loan_term = st.number_input("Loan Term (years):", min_value=1, value=30, step=1)
+        num_units = st.number_input("Number of Units:", min_value=1, value=1, step=1)
+        depreciation = st.number_input("Annual Depreciation ($):", min_value=0.0, value=5000.0, step=100.0)
+        interest_deduction = st.number_input("Annual Interest Deduction ($):", min_value=0.0, value=4000.0, step=100.0)
 
     # Analysis Results Tab
     with tabs[1]:
@@ -68,10 +75,13 @@ def main():
                 cash_on_cash_return = (cash_flow / down_payment) * 100 if down_payment > 0 else 0
                 ltv = (loan_amount / property_price) * 100 if property_price > 0 else 0
                 opex_ratio = (total_expenses / rent) * 100 if rent > 0 else 0
+                cash_flow_per_unit = cash_flow / num_units if num_units > 0 else 0
 
                 # Advanced Metrics
                 irr = calculate_irr(property_price, rent, total_expenses, loan_amount, loan_term, interest_rate / 100)
                 payback_period = calculate_payback_period(down_payment, cash_flow)
+                tax_benefits = calculate_tax_benefits(depreciation, interest_deduction)
+                break_even_rent = (total_expenses + annual_debt_service) / num_units / 12 if num_units > 0 else 0
 
                 # Display Results
                 st.write(f"Net Operating Income (NOI): ${noi:,.2f}")
@@ -84,6 +94,9 @@ def main():
                 st.write(f"Operating Expense Ratio (OER): {opex_ratio:.2f}%")
                 st.write(f"Internal Rate of Return (IRR): {irr:.2f}%")
                 st.write(f"Payback Period: {'Not Applicable' if cash_flow <= 0 else f'{payback_period:.2f} years'}")
+                st.write(f"Cash Flow per Unit: ${cash_flow_per_unit:,.2f}")
+                st.write(f"Tax Benefits: ${tax_benefits:,.2f}")
+                st.write(f"Break-Even Rent (per unit per month): ${break_even_rent:,.2f}")
             except ValueError as e:
                 st.error(f"Error: {str(e)}")
             except Exception as e:
