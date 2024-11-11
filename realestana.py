@@ -29,7 +29,7 @@ def main():
     st.title("Real Estate Deal Analyzer")
 
     # Create tabs for different functionalities
-    tabs = st.tabs(["Property Input", "Analysis Results", "Scenario Analysis", "Sensitivity Analysis", "Historical Comparisons", "Donate"])
+    tabs = st.tabs(["Property Input", "Analysis Results", "Scenario Analysis", "Sensitivity Analysis", "Donate"])
 
     # Property Input Tab
     with tabs[0]:
@@ -133,14 +133,8 @@ def main():
             except Exception as e:
                 st.error(f"An error occurred: {str(e)}")
 
-    # Historical Comparisons Tab
-    with tabs[4]:
-        st.header("Historical Comparisons")
-        st.write("Comparison of multiple properties loaded here.")
-        # Placeholder for future implementation of data loading and comparison
-
     # Donate Tab
-    with tabs[5]:
+    with tabs[4]:
         st.header("Support My Work")
         st.write("If you enjoy using this tool, consider supporting my work!")
         if st.button("Buy Me a Coffee", key="donate_button"):
