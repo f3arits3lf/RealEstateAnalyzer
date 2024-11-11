@@ -40,17 +40,18 @@ def main():
     # Property Input Tab
     with tabs[0]:
         st.header("Property Input")
-        property_price = st.number_input("Property Price ($):", min_value=0.0, value=100000.0, step=1000.0)
-        rent_income = st.number_input("Monthly Rent Income ($):", min_value=0.0, value=1000.0, step=100.0)
-        operating_expenses = st.number_input("Operating Expenses ($/month):", min_value=0.0, value=200.0, step=50.0)
-        property_tax = st.number_input("Property Tax ($/year):", min_value=0.0, value=1200.0, step=100.0)
-        loan_amount = st.number_input("Loan Amount ($):", min_value=0.0, value=80000.0, step=1000.0)
-        down_payment = st.number_input("Down Payment ($):", min_value=0.0, value=20000.0, step=1000.0)
-        interest_rate = st.number_input("Interest Rate (%):", min_value=0.0, value=5.0, step=0.1)
+        st.selectbox("Select Scenario:", options=["Single-Family Rental Property", "Multi-Family Property"], key="scenario")
+        property_price = st.number_input("Property Price ($):", min_value=0.0, value=350000.0, step=1000.0)
+        rent_income = st.number_input("Monthly Rent Income ($):", min_value=0.0, value=2200.0, step=100.0)
+        operating_expenses = st.number_input("Operating Expenses ($/month):", min_value=0.0, value=400.0, step=50.0)
+        property_tax = st.number_input("Property Tax ($/year):", min_value=0.0, value=6000.0, step=100.0)
+        loan_amount = st.number_input("Loan Amount ($):", min_value=0.0, value=280000.0, step=1000.0)
+        down_payment = st.number_input("Down Payment ($):", min_value=0.0, value=70000.0, step=1000.0)
+        interest_rate = st.number_input("Interest Rate (%):", min_value=0.0, value=4.5, step=0.1)
         loan_term = st.number_input("Loan Term (years):", min_value=1, value=30, step=1)
         num_units = st.number_input("Number of Units:", min_value=1, value=1, step=1)
-        depreciation = st.number_input("Annual Depreciation ($):", min_value=0.0, value=5000.0, step=100.0)
-        interest_deduction = st.number_input("Annual Interest Deduction ($):", min_value=0.0, value=4000.0, step=100.0)
+        depreciation = st.number_input("Annual Depreciation ($):", min_value=0.0, value=10909.0, step=100.0)
+        interest_deduction = st.number_input("Annual Interest Deduction ($):", min_value=0.0, value=12600.0, step=100.0)
 
     # Analysis Results Tab
     with tabs[1]:
@@ -154,8 +155,16 @@ def main():
     # Sensitivity Analysis Tab
     with tabs[3]:
         st.header("Sensitivity Analysis")
-        interest_rates = np.linspace(interest_rate - 2, interest_rate + 2, 5)
-        rent_values = np.linspace(rent_income * 0.8, rent_income * 1.2, 5)
+        
+        # Interest rates and rent values range based on the scenario selected
+        scenario = st.session_state.get("scenario", "Single-Family Rental Property")
+        if "Single-Family" in scenario:
+            interest_rates = np.linspace(interest_rate - 1, interest_rate + 1, 5)
+            rent_values = np.linspace(rent_income * 0.8, rent_income * 1.2, 5)
+        elif "Multi-Family" in scenario:
+            interest_rates = np.linspace(interest_rate - 1.5, interest_rate + 1.5, 5)
+            rent_values = np.linspace(rent_income * 0.8, rent_income * 1.2, 5)
+
         perform_sensitivity_analysis_button = st.button("Perform Sensitivity Analysis", key="sensitivity_analysis")
 
         if perform_sensitivity_analysis_button:
